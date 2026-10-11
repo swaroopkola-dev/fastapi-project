@@ -97,7 +97,7 @@ Open `/docs` for request schemas and response models.
 pytest -q
 ```
 
-The initial suite covers route availability, unauthenticated-access rejection, ObjectId validation, password hashing, and avoiding password-hash leakage. These are smoke tests, not a complete integration suite. Add integration tests against a disposable MongoDB before production. Tests have not been executed inside this conversation's environment; run the command above locally or in CI.
+The initial suite covers route availability, unauthenticated-access rejection, ObjectId validation, password hashing, and avoiding password-hash leakage. These are smoke tests, not a complete integration suite. Add integration tests against a disposable MongoDB before production. Tests have not been executed in this environment; run the command above locally or in CI.
 
 ## Vercel deployment
 
@@ -109,9 +109,9 @@ The repository includes Vercel Python runtime routing. In Vercel Project Setting
 - `ACCESS_TOKEN_EXPIRE_MINUTES` = `60`
 - `CORS_ORIGINS` = exact trusted frontend origins, comma-separated (avoid `*` when credentials or real data are involved)
 
-**The deployed API's `/health` currently returns `degraded` because `MONGODB_URI` is a placeholder and isn't connected to Atlas yet.** Replace it with the real URI in Vercel's dashboard and redeploy; do not put database credentials into Git. Then verify `/health`, `/docs`, and an authenticated flow. The environment-value connector was unable to save the valid credential value in this setup, so it must be entered directly in the Vercel dashboard.
+The source is connected to the Vercel project, and production build is **READY**. The root endpoint and `/docs` return HTTP 200; the generated OpenAPI document lists 18 API paths. **Database-backed operations are not yet verified**: `/health` still returns `degraded` because `MONGODB_URI` remains a placeholder and is not connected to Atlas. Replace it directly in Vercel's dashboard with the real URI, then redeploy and verify `/health`, login, registration, and a CRUD flow. The environment-value connector could not save a valid secret value in this setup, so it must be entered directly in the dashboard. Do not put credentials in GitHub or chat.
 
-A MongoDB application user and password were created during setup. For safety, rotate the generated database password in Atlas and use the new password only in Vercel; do not paste it into GitHub or chat. Vercel Python runtime and connection behaviour can change, so confirm current platform limits. A container host can be more appropriate for a continuously running API.
+An Atlas app user was created for this setup. Rotate any generated database password in Atlas before using it. The project Atlas network access list also currently has `0.0.0.0/0`; restrict that rule before real use. Vercel Python runtime and connection behaviour can change, so confirm current platform limits. A container host can be more appropriate for a continuously running API.
 
 ## Security checklist
 Before handling real records, add rate limiting, email verification, password reset, audit logs, monitoring, backups, retention controls, stricter CORS, and an independent security review. Use HTTPS, least-privilege database access, and synthetic test data. Disabled accounts are rejected on every authenticated request; otherwise tokens remain valid until expiry.
